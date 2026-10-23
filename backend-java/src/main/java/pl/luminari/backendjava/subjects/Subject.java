@@ -12,9 +12,7 @@ public class Subject {
     @Column(name = "nazwa")
     private String name;
 
-    protected Subject() {
-
-    }
+    protected Subject() {}
 
     public String getName() {
         return name;
