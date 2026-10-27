@@ -35,7 +35,7 @@ public class LearningPathController {
         List<TopicDto> result = new ArrayList<>();
 
         for (Topic topic : topics) {
-            List<Subtopic> subtopics = subtopicRepository.findByTopicIdOrderByIdAsc(subjectId);
+            List<Subtopic> subtopics = subtopicRepository.findByTopicIdOrderByIdAsc(topic.getId());
 
             List<SubtopicDto> subresult = new ArrayList<>();
 
