@@ -1,0 +1,10 @@
+POST http://localhost:8080/test/result
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "answers": [
+    { "questionId": 1, "answer": "A" },
+    { "questionId": 2, "answer": "B" }
+  ]
+}
