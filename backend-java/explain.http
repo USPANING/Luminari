@@ -1,0 +1,10 @@
+POST http://localhost:8080/ai/explain
+Content-Type: application/json
+
+{
+  "studentId": 1,
+  "mistakes": [
+    { "questionId": 1, "answer": "A" },
+    { "questionId": 2, "answer": "C" }
+  ]
+}

@@ -22,8 +22,10 @@ public class OpenAiClient {
 
     public String ask(String prompt) {
         Map<String, Object> body = Map.of(
-                "model", "gpt-4o-mini",
+                "model", "gpt-4.1-mini",
+                "temperature", 0.3,
                 "messages", List.of(Map.of("role", "user", "content", prompt))
+
         );
 
         OpenAiResponse response = restClient.post()
