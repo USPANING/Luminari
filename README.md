@@ -44,8 +44,8 @@ DTOs never expose the correct answers to the client.
 | `GET` | `/przedmioty` | List of school subjects (to be renamed to `/subjects`) | Done |
 | `GET` | `/learning-path/{subjectId}` | Topics → subtopics → questions for a subject, as nested JSON | Done |
 | `POST` | `/test/result` | Checks the student's answers, saves them, returns the score | Done |
-| `POST` | `/ai/explain` | AI explanation of the student's mistakes |  Currently working on it |
-| `GET` | dictionary by subtopic | Polish ↔ native language terms |  Planned |
+| `POST` | `/ai/explain` | AI explanation of the student's mistakes |  Done |
+| `GET` | dictionary by subtopic | Polish ↔ native language terms |  Currently working on it |
 | `POST` | mark a term | Saves a term as difficult for the student |  Planned |
 
 ### Example: `POST /test/result`
@@ -151,8 +151,8 @@ It needs a `backend/.env` file (not committed) with `SUPABASE_URL` and `SUPABASE
 
 - [x] `GET /learning-path/{subjectId}` in Java
 - [x] `POST /test/result` in Java
-- [ ] `POST /ai/explain` in Java (OpenAI key on the backend only)
-- [ ] Rename `/przedmioty` to `/subjects`
+- [x] `POST /ai/explain` in Java (OpenAI key on the backend only)
+- [x] Rename `/przedmioty` to `/subjects`
 - [ ] Dictionary endpoints (terms by subtopic, marking difficult terms)
 - [ ] Switch the frontend to the Java backend and English field names
 - [ ] Remove the legacy Python backend
