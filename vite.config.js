@@ -6,10 +6,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/przedmioty': 'http://127.0.0.1:8000',
-      '/sciezka': 'http://127.0.0.1:8000',
-      '/test': 'http://127.0.0.1:8000',
-      '/ai': 'http://127.0.0.1:8000',
+      '/subjects': 'http://127.0.0.1:8080',
+      '/learning-path': 'http://127.0.0.1:8080',
+      '/test': 'http://127.0.0.1:8080',
+      '/ai': 'http://127.0.0.1:8080',
     }
   }
 })

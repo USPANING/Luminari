@@ -1,24 +1,23 @@
 import { useState, useEffect } from "react";
 interface Answer {
-	pytanie_id: number;
-	odpowiedz: string;
+	questionId: number;
+	answer: string;
 }
 interface TestSummaryProps {
 	answers: Answer[];
-	wrongAnswers: Answer[];
 	userId: number;
 	onClose: () => void;
 	t: Record<string, string>;
 }
 
 interface TestResult {
-	procent: number;
-	poprawne: number;
-	wszystkie: number;
+	percent: number;
+  wrongAnswers: Answer[];
+	correct: number;
+	total: number;
 }
 export default function TestSummary({
 	answers,
-	wrongAnswers,
 	userId,
 	onClose,
 	t,
@@ -35,12 +34,12 @@ export default function TestSummary({
 		const fetchResult = async () => {
 			try {
 				setLoadingResult(true);
-				const res = await fetch("/test/wynik", {
+				const res = await fetch("/test/result", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						uczen_id: userId,
-						odpowiedzi: answers,
+						studentId: userId,
+             answers: answers
 					}),
 				});
 				if (!res.ok) throw new Error("Failed to submit test");
@@ -60,24 +59,22 @@ export default function TestSummary({
 			setLoadingExplanation(true);
 			setExplanationError(null);
 
-			const bledy = (wrongAnswers || []).map((wa) => ({
-				pytanie_id: wa.pytanie_id,
-				odpowiedz_ucznia: wa.odpowiedz,
+			const mistakes = (result?.wrongAnswers || []).map((wa) => ({
+				questionId: wa.questionId,
+				answer: wa.answer,
 			}));
 
-			console.log("Sending to AI:", JSON.stringify(bledy));
-
-			const res = await fetch("/ai/wyjasnij", {
+			const res = await fetch("/ai/explain", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					uczen_id: userId,
-					bledy,
+					studentId: userId,
+					mistakes,
 				}),
 			});
 			if (!res.ok) throw new Error("Failed to generate explanation");
 			const data = await res.json();
-			setExplanation(data.wyjasnienie);
+			setExplanation(data.explanation);
 		} catch (err) {
 			err instanceof Error ? setExplanationError(err.message) : setExplanationError("Unknown Error");
 		} finally {
@@ -171,7 +168,7 @@ export default function TestSummary({
 									fontWeight: "700",
 									color: "var(--primary-cyan)",
 								}}>
-								{result.procent}%
+								{result.percent}%
 							</span>
 						</div>
 
@@ -185,11 +182,11 @@ export default function TestSummary({
 									marginBottom: "15px",
 								}}>
 								<span style={{ color: "var(--text-muted)" }}>{t.correct}:</span>
-								<span style={{ fontWeight: "600" }}>{result.poprawne}</span>
+								<span style={{ fontWeight: "600" }}>{result.correct}</span>
 							</div>
 							<div style={{ display: "flex", justifyContent: "space-between" }}>
 								<span style={{ color: "var(--text-muted)" }}>{t.total}:</span>
-								<span style={{ fontWeight: "600" }}>{result.wszystkie}</span>
+								<span style={{ fontWeight: "600" }}>{result.total}</span>
 							</div>
 						</div>
 
