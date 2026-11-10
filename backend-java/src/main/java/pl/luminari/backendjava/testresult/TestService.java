@@ -6,6 +6,9 @@ import pl.luminari.backendjava.questions.QuestionRepository;
 import pl.luminari.backendjava.results.AnswerRecord;
 import pl.luminari.backendjava.results.AnswerRecordRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class TestService {
@@ -19,12 +22,15 @@ public class TestService {
     }
 
     public TestResultResponse checkTest(TestResultRequest request) {
+        List<AnswerDto> wrongAnswers = new ArrayList<>();
         int countCorrect = 0;
         for (AnswerDto answerDto : request.answers()) {
             Question question = questionRepository.findById(answerDto.questionId()).orElseThrow();
             boolean isCorrect = answerDto.answer().equals(question.getCorrectAnswer());
             if (isCorrect) {
                 countCorrect += 1;
+            } else {
+                wrongAnswers.add(answerDto);
             }
             AnswerRecord studentResult = new AnswerRecord(request.studentId(), answerDto.questionId(),
                     answerDto.answer(), isCorrect);
@@ -37,6 +43,6 @@ public class TestService {
             percent = Math.round(p * 10) / 10.0;
         }
 
-        return new TestResultResponse(countCorrect, totalQuestions, percent);
+        return new TestResultResponse(countCorrect, totalQuestions, percent, wrongAnswers);
     }
 }

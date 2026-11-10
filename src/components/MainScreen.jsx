@@ -225,7 +225,7 @@ const SubjectsTab = ({ t, onSubjectSelect }) => {
     const fetchSubjects = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/przedmioty/");
+        const res = await fetch("/subjects");
         if (!res.ok) throw new Error("Failed to fetch subjects");
         const data = await res.json();
         setSubjects(data);
@@ -283,7 +283,7 @@ const SubjectsTab = ({ t, onSubjectSelect }) => {
               onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
               <span style={{ fontSize: "18px", fontWeight: "500" }}>
-                {subject.nazwa}
+                {subject.name}
               </span>
               <span style={{ fontSize: "24px", opacity: 0.5 }}>›</span>
             </div>
@@ -485,16 +485,14 @@ export default function MainScreen({ user, onLogout, t }) {
   const [testSubjectId, setTestSubjectId] = useState(null);
   const [testAttemptId, setTestAttemptId] = useState(null);
   const [finishedAnswers, setFinishedAnswers] = useState(null);
-  const [finishedWrongAnswers, setFinishedWrongAnswers] = useState(null);
 
   const handleSubjectSelect = (subjectId) => {
     setTestSubjectId(subjectId);
     setTestAttemptId(Date.now());
   };
 
-  const handleTestFinish = (answers, wrongAnswers) => {
+  const handleTestFinish = (answers) => {
     setFinishedAnswers(answers);
-    setFinishedWrongAnswers(wrongAnswers);
     setTestSubjectId(null);
   };
 
@@ -511,7 +509,6 @@ export default function MainScreen({ user, onLogout, t }) {
     return (
       <TestSummary
         answers={finishedAnswers}
-        wrongAnswers={finishedWrongAnswers}
         userId={user.uczen_id}
         onClose={handleSummaryClose}
         t={t}
