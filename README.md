@@ -25,7 +25,7 @@ Luminari is a multilingual learning platform that helps migrant students in Poli
 ```
 React (Vite) ──HTTP/JSON──► Spring Boot ──JPA──► PostgreSQL (Supabase)
                                  │
-                                 └──► OpenAI API (planned: /ai/explain)
+                                 └──► OpenAI API (/ai/explain)
 ```
 
 The Java backend follows a layered structure:
@@ -41,7 +41,7 @@ DTOs never expose the correct answers to the client.
 
 | Method | Endpoint | Description | Status |
 |---|---|---|---|
-| `GET` | `/przedmioty` | List of school subjects (to be renamed to `/subjects`) | Done |
+| `GET` | `/subjects` | List of school subjects | Done |
 | `GET` | `/learning-path/{subjectId}` | Topics → subtopics → questions for a subject, as nested JSON | Done |
 | `POST` | `/test/result` | Checks the student's answers, saves them, returns the score | Done |
 | `POST` | `/ai/explain` | AI explanation of the student's mistakes |  Done |
