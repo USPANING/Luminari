@@ -1,4 +1,10 @@
 package pl.luminari.backendjava.testresult;
 
-public record AnswerDto(Long questionId, String answer) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record AnswerDto(
+        @NotNull Long questionId,
+        @NotBlank String answer
+) {
 }
