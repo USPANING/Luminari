@@ -1,6 +1,7 @@
 package pl.luminari.backendjava.explain;
 
 import org.springframework.stereotype.Service;
+import pl.luminari.backendjava.error.ResourceNotFoundException;
 import pl.luminari.backendjava.questions.Question;
 import pl.luminari.backendjava.questions.QuestionRepository;
 import pl.luminari.backendjava.students.Student;
@@ -22,7 +23,7 @@ public class ExplainService {
         if (request.mistakes().isEmpty()) {
             return new ExplainResponse("Brak błędów do wyjaśnienia, wszystkie odpowiedzi poprawne!");
         }
-        Student student = studentRepository.findById(request.studentId()).orElseThrow();
+        Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found: " + request.studentId()));
         String language = student.getNativeLanguage();
         if (language == null) {
             language = "polski";
@@ -30,7 +31,7 @@ public class ExplainService {
 
         StringBuilder details = new StringBuilder();
         for (MistakeDto mistake : request.mistakes()) {
-            Question question = questionRepository.findById(mistake.questionId()).orElseThrow();
+            Question question = questionRepository.findById(mistake.questionId()).orElseThrow(() -> new ResourceNotFoundException("Question not found: " + mistake.questionId()));
             details.append("Pytanie: " + question.getContent() + "\n");
             details.append("Warianty: " + question.getAnswers() + "\n");
             details.append("Odpowiedź ucznia: " + mistake.answer() + "\n");
