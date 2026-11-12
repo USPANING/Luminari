@@ -1,5 +1,6 @@
 package pl.luminari.backendjava.testresult;
 
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,7 @@ public class TestController {
     }
 
     @PostMapping("/result")
-    public TestResultResponse checkTest(@RequestBody TestResultRequest request) {
+    public TestResultResponse checkTest(@Valid @RequestBody TestResultRequest request) {
     return testService.checkTest(request);
     }
 }

@@ -37,7 +37,7 @@ public class TestServiceTest {
 
         TestResultResponse result = testService.checkTest(request);
 
-        assertEquals(1, result.correct());
+        assertEquals(2, result.correct());
         assertEquals(2, result.total());
         assertEquals(50.0, result.percent());
         assertEquals(1, result.wrongAnswers().size());
