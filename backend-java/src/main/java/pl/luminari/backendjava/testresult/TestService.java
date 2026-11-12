@@ -1,6 +1,7 @@
 package pl.luminari.backendjava.testresult;
 
 import org.springframework.stereotype.Service;
+import pl.luminari.backendjava.error.ResourceNotFoundException;
 import pl.luminari.backendjava.questions.Question;
 import pl.luminari.backendjava.questions.QuestionRepository;
 import pl.luminari.backendjava.results.AnswerRecord;
@@ -25,7 +26,7 @@ public class TestService {
         List<AnswerDto> wrongAnswers = new ArrayList<>();
         int countCorrect = 0;
         for (AnswerDto answerDto : request.answers()) {
-            Question question = questionRepository.findById(answerDto.questionId()).orElseThrow();
+            Question question = questionRepository.findById(answerDto.questionId()).orElseThrow(() -> new ResourceNotFoundException("Question not found: " + answerDto.questionId()));
             boolean isCorrect = answerDto.answer().equals(question.getCorrectAnswer());
             if (isCorrect) {
                 countCorrect += 1;
