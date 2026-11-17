@@ -74,11 +74,11 @@ public class ExplainService {
                 Pytanie: [dokładna treść pytania po polsku]
                 Twoja odpowiedź: [litera i treść odpowiedzi ucznia]
                 Poprawna odpowiedź: [litera i treść poprawnej odpowiedzi]
-                Wyjaśnienie: [2-3 proste zdania w języku %1$s: dlaczego poprawna odpowiedź jest poprawna i czym różni się od odpowiedzi ucznia]
+                Wyjaśnienie: [2-3 proste zdania w języku ucznia (%1$s): dlaczego poprawna odpowiedź jest poprawna i czym różni się od odpowiedzi ucznia]
                 
                 Zasady dla pola "Wyjaśnienie":
-                1. Całe wyjaśnienie pisz WYŁĄCZNIE w języku %1$s. Po polsku piszesz TYLKO nazwy terminów w nawiasach.
-                2. Każdy termin przedmiotowy pisz w języku %1$s, a zaraz po nim w nawiasie jego polską nazwę, np. "трикутник (trójkąt)".
+                1. Całe wyjaśnienie pisz WYŁĄCZNIE w języku ucznia (%1$s). Po polsku piszesz TYLKO nazwy terminów w nawiasach.
+                2. Każdy termin przedmiotowy pisz w języku ucznia (%1$s), a zaraz po nim w nawiasie jego polską nazwę, np. "трикутник (trójkąt)".
                 3. Nie używaj słów angielskich.
                 4. Bez żargonu i bez oceniania ucznia.
                 
