@@ -2,21 +2,29 @@ package pl.luminari.backendjava.explain;
 
 import org.springframework.stereotype.Service;
 import pl.luminari.backendjava.error.ResourceNotFoundException;
+import pl.luminari.backendjava.materials.Material;
+import pl.luminari.backendjava.materials.MaterialRepository;
 import pl.luminari.backendjava.questions.Question;
 import pl.luminari.backendjava.questions.QuestionRepository;
 import pl.luminari.backendjava.students.Student;
 import pl.luminari.backendjava.students.StudentRepository;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class ExplainService {
     private final StudentRepository studentRepository;
     private final QuestionRepository questionRepository;
     private final OpenAiClient openAiClient;
+    private final MaterialRepository materialRepository;
 
-    public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository, OpenAiClient openAiClient) {
+    public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository, OpenAiClient openAiClient, MaterialRepository materialRepository) {
         this.studentRepository = studentRepository;
         this.questionRepository = questionRepository;
         this.openAiClient = openAiClient;
+        this.materialRepository = materialRepository;
     }
 
     public ExplainResponse explain(ExplainRequest request) {
@@ -30,12 +38,26 @@ public class ExplainService {
         }
 
         StringBuilder details = new StringBuilder();
+        Set<Long> subtopicIds = new HashSet<>();
         for (MistakeDto mistake : request.mistakes()) {
             Question question = questionRepository.findById(mistake.questionId()).orElseThrow(() -> new ResourceNotFoundException("Question not found: " + mistake.questionId()));
+            subtopicIds.add(question.getSubtopicId());
             details.append("Pytanie: " + question.getContent() + "\n");
             details.append("Warianty: " + question.getAnswers() + "\n");
             details.append("Odpowiedź ucznia: " + mistake.answer() + "\n");
             details.append("Poprawna odpowiedź: " + question.getCorrectAnswer() + "\n\n");
+        }
+        StringBuilder materials = new StringBuilder();
+        for(Long subtopicId : subtopicIds) {
+            List<Material> chunks = materialRepository.findBySubtopicIdOrderByIdAsc(subtopicId);
+            for (Material chunk : chunks) {
+                materials.append(chunk.getContent());
+                materials.append("\n\n");
+            }
+        }
+        String materialsText = materials.toString();
+        if (materialsText.isEmpty()) {
+            materialsText = "Brak materiałów.";
         }
         String prompt = """
                 Rola: Jesteś cierpliwym korepetytorem dla ucznia szkoły średniej w Polsce.
@@ -44,6 +66,9 @@ public class ExplainService {
                 Poniżej lista pytań, w których uczeń popełnił błąd w tym teście (z wariantami odpowiedzi):
                 
                 %2$s
+                Materiały z podręcznika do tych tematów (użyj ich jako głównego źródła wyjaśnienia; jeśli nie pasują do pytania, zignoruj je i nie wymyślaj faktów):
+                
+                %3$s
                 Zadanie: Dla KAŻDEGO pytania wygeneruj blok DOKŁADNIE w tym formacie:
                 
                 Pytanie: [dokładna treść pytania po polsku]
@@ -66,7 +91,7 @@ public class ExplainService {
                 Oddziel bloki jedną pustą linią. Bez wstępu i bez podsumowania.
                 Format: zwykły tekst, BEZ Markdown (bez #, bez **, bez numerowania).
                 Nie pisz nic poza tematem pytań.
-                """.formatted(language, details);
+                """.formatted(language, details, materialsText);
 
         String text = openAiClient.ask(prompt);
         return new ExplainResponse(text);
