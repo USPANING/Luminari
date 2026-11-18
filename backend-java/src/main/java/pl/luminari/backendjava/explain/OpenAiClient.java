@@ -24,6 +24,7 @@ public class OpenAiClient {
         Map<String, Object> body = Map.of(
                 "model", "gpt-4.1-mini",
                 "temperature", 0.3,
+                "response_format", Map.of("type", "json_object"),
                 "messages", List.of(Map.of("role", "user", "content", prompt))
 
         );

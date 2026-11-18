@@ -1,4 +1,6 @@
 package pl.luminari.backendjava.explain;
 
-public record ExplainResponse(String explanation) {
+import java.util.List;
+
+public record ExplainResponse(List<ExplanationItem> items) {
 }
