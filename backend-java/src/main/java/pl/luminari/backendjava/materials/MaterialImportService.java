@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.luminari.backendjava.error.ResourceNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,7 @@ public class MaterialImportService {
         InputStream input = getClass().getClassLoader()
                 .getResourceAsStream("materials/" + fileName);
         if (input == null) {
-            throw new IOException("PDF not found: " + fileName);
+            throw new ResourceNotFoundException("PDF not found: " + fileName);
         }
 
         String text;

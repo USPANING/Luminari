@@ -12,7 +12,7 @@ interface TestSummaryProps {
 
 interface TestResult {
 	percent: number;
-  wrongAnswers: Answer[];
+	wrongAnswers: Answer[];
 	correct: number;
 	total: number;
 }
@@ -45,14 +45,16 @@ export default function TestSummary({
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						studentId: userId,
-             answers: answers
+						answers: answers,
 					}),
 				});
 				if (!res.ok) throw new Error("Failed to submit test");
 				const data = await res.json();
 				setResult(data);
 			} catch (err) {
-				err instanceof Error ? setResultError(err.message) : setResultError("Unknown Error");
+				err instanceof Error
+					? setResultError(err.message)
+					: setResultError("Unknown Error");
 			} finally {
 				setLoadingResult(false);
 			}
@@ -82,7 +84,9 @@ export default function TestSummary({
 			const data = await res.json();
 			setItems(data.items);
 		} catch (err) {
-			err instanceof Error ? setExplanationError(err.message) : setExplanationError("Unknown Error");
+			err instanceof Error
+				? setExplanationError(err.message)
+				: setExplanationError("Unknown Error");
 		} finally {
 			setLoadingExplanation(false);
 		}
@@ -196,17 +200,30 @@ export default function TestSummary({
 							</div>
 						</div>
 
-						{!items && !loadingExplanation && (
-							<button
-								className='btn-primary'
-								onClick={handleExplain}
-								style={{
-									background: "linear-gradient(135deg, #8a2be2, #4a00e0)",
-									border: "none",
-								}}>
-								✨ {t.explainMistakes}
-							</button>
-						)}
+						{!items &&
+							!loadingExplanation &&
+							result.wrongAnswers.length > 0 && (
+									<button
+										className='btn-primary'
+										onClick={handleExplain}
+										style={{
+											background: "linear-gradient(135deg, #8a2be2, #4a00e0)",
+											border: "none",
+										}}>
+										✨ {t.explainMistakes}
+									</button>
+								)}
+                {result.wrongAnswers.length === 0 && (
+									<div
+										style={{
+											color: "#7ee2b0",
+											fontSize: "18px",
+											fontWeight: "600",
+											marginTop: "10px",
+										}}>
+										Super! Wszystkie odpowiedzi są poprawne!
+									</div>
+								)}
 
 						{loadingExplanation && (
 							<div
@@ -234,7 +251,7 @@ export default function TestSummary({
 							</div>
 						)}
 
-						{items  && (
+						{items && (
 							<div
 								className='fade-in glass-panel'
 								style={{
@@ -251,29 +268,39 @@ export default function TestSummary({
 									}}>
 									✨ AI Explanation
 								</h3>
+								{items.length === 0 && (
+									<div style={{ color: "#7ee2b0" }}>
+										Brak błędów do wyjaśnienia, wszystkie odpowiedzi poprawne!
+									</div>
+								)}
 								{items.map((item, index) => (
-	<div
-		key={index}
-		style={{
-			padding: "14px 16px",
-			marginBottom: "12px",
-			borderRadius: "12px",
-			background: "rgba(255, 255, 255, 0.05)",
-		}}>
-		<div style={{ fontWeight: "600", marginBottom: "8px" }}>
-			{item.question}
-		</div>
-		<div style={{ color: "#ff8a9a", marginBottom: "4px" }}>
-			✗ {item.studentAnswer}
-		</div>
-		<div style={{ color: "#7ee2b0", marginBottom: "8px" }}>
-			✓ {item.correctAnswer}
-		</div>
-		<div style={{ fontSize: "15px", lineHeight: "1.6", color: "var(--text-main)" }}>
-			{item.explanation}
-		</div>
-	</div>
-))}
+									<div
+										key={index}
+										style={{
+											padding: "14px 16px",
+											marginBottom: "12px",
+											borderRadius: "12px",
+											background: "rgba(255, 255, 255, 0.05)",
+										}}>
+										<div style={{ fontWeight: "600", marginBottom: "8px" }}>
+											{item.question}
+										</div>
+										<div style={{ color: "#ff8a9a", marginBottom: "4px" }}>
+											✗ {item.studentAnswer}
+										</div>
+										<div style={{ color: "#7ee2b0", marginBottom: "8px" }}>
+											✓ {item.correctAnswer}
+										</div>
+										<div
+											style={{
+												fontSize: "15px",
+												lineHeight: "1.6",
+												color: "var(--text-main)",
+											}}>
+											{item.explanation}
+										</div>
+									</div>
+								))}
 							</div>
 						)}
 					</div>
