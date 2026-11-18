@@ -9,6 +9,7 @@ import pl.luminari.backendjava.questions.Question;
 import pl.luminari.backendjava.questions.QuestionRepository;
 import pl.luminari.backendjava.students.Student;
 import pl.luminari.backendjava.students.StudentRepository;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,19 +22,22 @@ public class ExplainService {
     private final OpenAiClient openAiClient;
     private final MaterialRepository materialRepository;
     private final boolean ragEnabled;
+    private final JsonMapper jsonMapper;
 
     public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository,
-                          OpenAiClient openAiClient, MaterialRepository materialRepository, @Value("${luminari.rag.enabled}") boolean ragEnabled ) {
+                          OpenAiClient openAiClient, MaterialRepository materialRepository,
+                          @Value("${luminari.rag.enabled}") boolean ragEnabled, JsonMapper jsonMapper ) {
         this.studentRepository = studentRepository;
         this.questionRepository = questionRepository;
         this.openAiClient = openAiClient;
         this.materialRepository = materialRepository;
         this.ragEnabled = ragEnabled;
+        this.jsonMapper = jsonMapper;
     }
 
     public ExplainResponse explain(ExplainRequest request) {
         if (request.mistakes().isEmpty()) {
-            return new ExplainResponse("Brak błędów do wyjaśnienia, wszystkie odpowiedzi poprawne!");
+            return new ExplainResponse(List.of());
         }
         Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found: " + request.studentId()));
         String language = student.getNativeLanguage();
@@ -75,31 +79,29 @@ public class ExplainService {
                 Materiały z podręcznika do tych tematów (użyj ich jako głównego źródła wyjaśnienia; jeśli nie pasują do pytania, zignoruj je i nie wymyślaj faktów):
                 
                 %3$s
-                Zadanie: Dla KAŻDEGO pytania wygeneruj blok DOKŁADNIE w tym formacie:
+                Zadanie: Dla KAŻDEGO pytania przygotuj jeden obiekt. Odpowiedz WYŁĄCZNIE poprawnym JSON w tym kształcie:
                 
-                Pytanie: [dokładna treść pytania po polsku]
-                Twoja odpowiedź: [litera i treść odpowiedzi ucznia]
-                Poprawna odpowiedź: [litera i treść poprawnej odpowiedzi]
-                Wyjaśnienie: [2-3 proste zdania w języku ucznia (%1$s): dlaczego poprawna odpowiedź jest poprawna i czym różni się od odpowiedzi ucznia]
+                {"items": [{"question": "...", "studentAnswer": "...", "correctAnswer": "...", "explanation": "..."}]}
                 
-                Zasady dla pola "Wyjaśnienie":
+                Pola:
+                - question: dokładna treść pytania po polsku
+                - studentAnswer: litera i treść odpowiedzi ucznia
+                - correctAnswer: litera i treść poprawnej odpowiedzi
+                - explanation: 2-3 proste zdania w języku ucznia (%1$s): dlaczego poprawna odpowiedź jest poprawna i czym różni się od odpowiedzi ucznia
+                
+                Zasady dla pola "explanation":
                 1. Całe wyjaśnienie pisz WYŁĄCZNIE w języku ucznia (%1$s). Po polsku piszesz TYLKO nazwy terminów w nawiasach.
                 2. Każdy termin przedmiotowy pisz w języku ucznia (%1$s), a zaraz po nim w nawiasie jego polską nazwę, np. "трикутник (trójkąt)".
                 3. Nie używaj słów angielskich.
                 4. Bez żargonu i bez oceniania ucznia.
                 
-                Przykład jednego bloku (dla języka ukraińskiego, z innego przedmiotu — nie kopiuj go):
-                Pytanie: Gdzie zachodzi fotosynteza?
-                Twoja odpowiedź: A. w mitochondriach
-                Poprawna odpowiedź: C. w chloroplastach
-                Wyjaśnienie: Фотосинтез (fotosynteza) відбувається в хлоропластах (chloroplasty), бо саме там є хлорофіл (chlorofil), який поглинає світло. Мітохондрії (mitochondria) відповідають за клітинне дихання, а не за фотосинтез.
+                Przykład jednego obiektu (dla języka ukraińskiego, z innego przedmiotu — nie kopiuj go):
+                {"question": "Gdzie zachodzi fotosynteza?", "studentAnswer": "A. w mitochondriach", "correctAnswer": "C. w chloroplastach", "explanation": "Фотосинтез (fotosynteza) відбувається в хлоропластах (chloroplasty), бо саме там є хлорофіл (chlorofil), який поглинає світло. Мітохондрії (mitochondria) відповідають за клітинне дихання, а не за фотосинтез."}
                 
-                Oddziel bloki jedną pustą linią. Bez wstępu i bez podsumowania.
-                Format: zwykły tekst, BEZ Markdown (bez #, bez **, bez numerowania).
-                Nie pisz nic poza tematem pytań.
+                Bez Markdown, bez ```, bez żadnego tekstu przed JSON ani po nim.
                 """.formatted(language, details, materialsText);
 
         String text = openAiClient.ask(prompt);
-        return new ExplainResponse(text);
+        return jsonMapper.readValue(text, ExplainResponse.class);
     }
 }
