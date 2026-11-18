@@ -23,16 +23,19 @@ public class ExplainService {
     private final MaterialRepository materialRepository;
     private final boolean ragEnabled;
     private final JsonMapper jsonMapper;
+    private final boolean reviewEnabled;
 
     public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository,
                           OpenAiClient openAiClient, MaterialRepository materialRepository,
-                          @Value("${luminari.rag.enabled}") boolean ragEnabled, JsonMapper jsonMapper ) {
+                          @Value("${luminari.rag.enabled}") boolean ragEnabled, JsonMapper jsonMapper,
+                          @Value("${luminari.review.enabled}") boolean reviewEnabled ) {
         this.studentRepository = studentRepository;
         this.questionRepository = questionRepository;
         this.openAiClient = openAiClient;
         this.materialRepository = materialRepository;
         this.ragEnabled = ragEnabled;
         this.jsonMapper = jsonMapper;
+        this.reviewEnabled = reviewEnabled;
     }
 
     public ExplainResponse explain(ExplainRequest request) {
@@ -101,7 +104,31 @@ public class ExplainService {
                 Bez Markdown, bez ```, bez żadnego tekstu przed JSON ani po nim.
                 """.formatted(language, details, materialsText);
 
-        String text = openAiClient.ask(prompt);
-        return jsonMapper.readValue(text, ExplainResponse.class);
+        String draft = openAiClient.ask(prompt);
+        if (!reviewEnabled) {
+            return jsonMapper.readValue(draft, ExplainResponse.class);
+        }
+        String reviewPrompt = """
+        Rola: Jesteś redaktorem, który sprawdza wyjaśnienia dla ucznia przed wysłaniem.
+
+        Język ojczysty ucznia: %1$s.
+        Poniżej JSON z wyjaśnieniami błędów:
+
+        %2$s
+
+        Sprawdź KAŻDE pole "explanation" i popraw je, jeśli trzeba:
+        1. Cały tekst musi być w języku ucznia (%1$s). Po polsku TYLKO nazwy terminów w nawiasach.
+        2. Każdy termin przedmiotowy musi mieć polską nazwę w nawiasie, np. "трикутник (trójkąt)".
+        3. Używaj naturalnych szkolnych terminów języka ucznia, a nie dosłownych kalk z polskiego (np. "коефіцієнт нахилу", a nie "коефіцієнт напрямку").
+        4. Nie mieszaj alfabetów w jednym słowie.
+        5. Wyjaśnienie musi zgadzać się z polem "correctAnswer".
+
+        NIE zmieniaj pól "question", "studentAnswer", "correctAnswer". Zachowaj tę samą liczbę obiektów i tę samą kolejność.
+        Jeśli wyjaśnienie jest dobre, zostaw je bez zmian.
+        Odpowiedz WYŁĄCZNIE poprawnym JSON w tym samym kształcie: {"items": [...]}.
+        """.formatted(language, draft);
+
+        String reviewed = openAiClient.ask(reviewPrompt);
+        return jsonMapper.readValue(reviewed, ExplainResponse.class);
     }
 }
