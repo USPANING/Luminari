@@ -84,6 +84,8 @@ public class ExplainService {
                 %3$s
                 Zadanie: Dla KAŻDEGO pytania przygotuj jeden obiekt. Odpowiedz WYŁĄCZNIE poprawnym JSON w tym kształcie:
                 
+                Uczeń popełnił %4$s błędów, więc w "items" musi być DOKŁADNIE %4$s obiektów.
+                
                 {"items": [{"question": "...", "studentAnswer": "...", "correctAnswer": "...", "explanation": "..."}]}
                 
                 Pola:
@@ -98,11 +100,10 @@ public class ExplainService {
                 3. Nie używaj słów angielskich.
                 4. Bez żargonu i bez oceniania ucznia.
                 
-                Przykład jednego obiektu (dla języka ukraińskiego, z innego przedmiotu — nie kopiuj go):
-                {"question": "Gdzie zachodzi fotosynteza?", "studentAnswer": "A. w mitochondriach", "correctAnswer": "C. w chloroplastach", "explanation": "Фотосинтез (fotosynteza) відбувається в хлоропластах (chloroplasty), бо саме там є хлорофіл (chlorofil), який поглинає світло. Мітохондрії (mitochondria) відповідають за клітинне дихання, а не за фотосинтез."}
-                
+                Przykład jednego obiektu (dla języka ukraińskiego, z geografii - nie kopiuj go):
+                {"question": "Która rzeka jest najdłuższa w Polsce?", "studentAnswer": "A. Odra", "correctAnswer": "B. Wisła", "explanation": "Найдовша річка (rzeka) у Польщі — Вісла (Wisła). Одра (Odra) теж велика, але коротша за Віслу."}
                 Bez Markdown, bez ```, bez żadnego tekstu przed JSON ani po nim.
-                """.formatted(language, details, materialsText);
+                """.formatted(language, details, materialsText, request.mistakes().size()   );
 
         String draft = openAiClient.ask(prompt);
         if (!reviewEnabled) {
