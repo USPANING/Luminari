@@ -51,6 +51,7 @@ public class MaterialImportService {
         StringBuilder cleaned = new StringBuilder();
         for (String part : parts) {
             part = part.strip();
+            part = part.replace("\u0000", "");
             if (part.length() < 4 || part.startsWith("Źródło:") || part.contains("/preview/") || part.contains("atrapa_animacja") || part.contains("Zasób interaktywny")) {
                 continue;
             } else {
