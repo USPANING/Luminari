@@ -1,5 +1,6 @@
 package pl.luminari.backendjava.explain;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pl.luminari.backendjava.error.ResourceNotFoundException;
 import pl.luminari.backendjava.materials.Material;
@@ -19,12 +20,15 @@ public class ExplainService {
     private final QuestionRepository questionRepository;
     private final OpenAiClient openAiClient;
     private final MaterialRepository materialRepository;
+    private final boolean ragEnabled;
 
-    public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository, OpenAiClient openAiClient, MaterialRepository materialRepository) {
+    public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository,
+                          OpenAiClient openAiClient, MaterialRepository materialRepository, @Value("${luminari.rag.enabled}") boolean ragEnabled ) {
         this.studentRepository = studentRepository;
         this.questionRepository = questionRepository;
         this.openAiClient = openAiClient;
         this.materialRepository = materialRepository;
+        this.ragEnabled = ragEnabled;
     }
 
     public ExplainResponse explain(ExplainRequest request) {
@@ -48,11 +52,13 @@ public class ExplainService {
             details.append("Poprawna odpowiedź: " + question.getCorrectAnswer() + "\n\n");
         }
         StringBuilder materials = new StringBuilder();
-        for(Long subtopicId : subtopicIds) {
-            List<Material> chunks = materialRepository.findBySubtopicIdOrderByIdAsc(subtopicId);
-            for (Material chunk : chunks) {
-                materials.append(chunk.getContent());
-                materials.append("\n\n");
+        if (ragEnabled) {
+            for(Long subtopicId : subtopicIds) {
+                List<Material> chunks = materialRepository.findBySubtopicIdOrderByIdAsc(subtopicId);
+                for (Material chunk : chunks) {
+                    materials.append(chunk.getContent());
+                    materials.append("\n\n");
+                }
             }
         }
         String materialsText = materials.toString();
