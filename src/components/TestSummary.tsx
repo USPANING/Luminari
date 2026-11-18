@@ -16,6 +16,12 @@ interface TestResult {
 	correct: number;
 	total: number;
 }
+interface ExplanationItem {
+	question: string;
+	studentAnswer: string;
+	correctAnswer: string;
+	explanation: string;
+}
 export default function TestSummary({
 	answers,
 	userId,
@@ -26,7 +32,7 @@ export default function TestSummary({
 	const [loadingResult, setLoadingResult] = useState(true);
 	const [resultError, setResultError] = useState<string | null>(null);
 
-	const [explanation, setExplanation] = useState<string | null>(null);
+	const [items, setItems] = useState<ExplanationItem[] | null>(null);
 	const [loadingExplanation, setLoadingExplanation] = useState(false);
 	const [explanationError, setExplanationError] = useState<string | null>(null);
 
@@ -74,7 +80,7 @@ export default function TestSummary({
 			});
 			if (!res.ok) throw new Error("Failed to generate explanation");
 			const data = await res.json();
-			setExplanation(data.explanation);
+			setItems(data.items);
 		} catch (err) {
 			err instanceof Error ? setExplanationError(err.message) : setExplanationError("Unknown Error");
 		} finally {
@@ -190,7 +196,7 @@ export default function TestSummary({
 							</div>
 						</div>
 
-						{!explanation && !loadingExplanation && (
+						{!items && !loadingExplanation && (
 							<button
 								className='btn-primary'
 								onClick={handleExplain}
@@ -228,7 +234,7 @@ export default function TestSummary({
 							</div>
 						)}
 
-						{explanation && (
+						{items  && (
 							<div
 								className='fade-in glass-panel'
 								style={{
@@ -245,15 +251,29 @@ export default function TestSummary({
 									}}>
 									✨ AI Explanation
 								</h3>
-								<div
-									style={{
-										fontSize: "15px",
-										lineHeight: "1.6",
-										whiteSpace: "pre-wrap",
-										color: "var(--text-main)",
-									}}>
-									{explanation}
-								</div>
+								{items.map((item, index) => (
+	<div
+		key={index}
+		style={{
+			padding: "14px 16px",
+			marginBottom: "12px",
+			borderRadius: "12px",
+			background: "rgba(255, 255, 255, 0.05)",
+		}}>
+		<div style={{ fontWeight: "600", marginBottom: "8px" }}>
+			{item.question}
+		</div>
+		<div style={{ color: "#ff8a9a", marginBottom: "4px" }}>
+			✗ {item.studentAnswer}
+		</div>
+		<div style={{ color: "#7ee2b0", marginBottom: "8px" }}>
+			✓ {item.correctAnswer}
+		</div>
+		<div style={{ fontSize: "15px", lineHeight: "1.6", color: "var(--text-main)" }}>
+			{item.explanation}
+		</div>
+	</div>
+))}
 							</div>
 						)}
 					</div>
