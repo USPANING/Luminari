@@ -13,6 +13,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -24,6 +25,17 @@ public class ExplainService {
     private final boolean ragEnabled;
     private final JsonMapper jsonMapper;
     private final boolean reviewEnabled;
+    private static final Map<String, String> LANGUAGE_NAMES = Map.of(
+            "uk", "ukraiński",
+            "ru", "rosyjski",
+            "be", "białoruski",
+            "ka", "gruziński",
+            "vi", "wietnamski",
+            "tr", "turecki",
+            "ar", "arabski",
+            "es", "hiszpański",
+            "en", "angielski"
+    );
 
     public ExplainService(StudentRepository studentRepository, QuestionRepository questionRepository,
                           OpenAiClient openAiClient, MaterialRepository materialRepository,
@@ -43,9 +55,10 @@ public class ExplainService {
             return new ExplainResponse(List.of());
         }
         Student student = studentRepository.findById(request.studentId()).orElseThrow(() -> new ResourceNotFoundException("Student not found: " + request.studentId()));
-        String language = student.getNativeLanguage();
-        if (language == null) {
-            language = "polski";
+        String code = student.getNativeLanguage();
+        String language = "angielski";
+        if (code != null) {
+            language = LANGUAGE_NAMES.getOrDefault(code, code);
         }
 
         StringBuilder details = new StringBuilder();
