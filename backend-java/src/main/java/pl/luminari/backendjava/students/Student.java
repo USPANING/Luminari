@@ -20,6 +20,12 @@ public class Student {
 
     protected Student() {}
 
+    public Student(String nickname, String schoolClass, String nativeLanguage) {
+        this.nickname = nickname;
+        this.schoolClass = schoolClass;
+        this.nativeLanguage = nativeLanguage;
+    }
+
     public Long getId() {return id;}
 
     public String getNickname() {return nickname;}
