@@ -10,6 +10,7 @@ export default defineConfig({
       '/learning-path': 'http://127.0.0.1:8080',
       '/test': 'http://127.0.0.1:8080',
       '/ai': 'http://127.0.0.1:8080',
+      '/students': 'http://127.0.0.1:8080',
     }
   }
 })
