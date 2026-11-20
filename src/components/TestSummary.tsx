@@ -221,7 +221,7 @@ export default function TestSummary({
 											fontWeight: "600",
 											marginTop: "10px",
 										}}>
-										Super! Wszystkie odpowiedzi są poprawne!
+										{t.allCorrect}
 									</div>
 								)}
 
