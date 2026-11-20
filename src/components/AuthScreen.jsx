@@ -24,7 +24,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 	const [role, setRole] = useState("");
 	const [nickname, setNickname] = useState("");
 	const [nativeLanguage, setNativeLanguage] = useState("");
-	const [profilePic, setProfilePic] = useState(null); // Can be a data URL or hex color
+	const [profilePic, setProfilePic] = useState(null);
 
 	/// Photo selection menu state
 	const [showPhotoMenu, setShowPhotoMenu] = useState(false);
@@ -69,10 +69,8 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 	const handleInitialSubmit = (e) => {
 		e.preventDefault();
 		if (isLogin) {
-			// Direct login bypasses wizard
 			onLogin("User", "Student", null);
 		} else {
-			// Start registration wizard transition
 			setRegStep(1);
 			setTimeout(() => {
 				setRegStep(2);
@@ -167,7 +165,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 							margin: "15px 0",
 							animation: `scrollText 3s linear ${i * 0.15}s infinite`,
 						}}>
-						Добро пожаловать
+						{t.welcome}
 					</h1>
 				))}
 			</div>
@@ -192,7 +190,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 						marginBottom: "30px",
 						textAlign: "center",
 					}}>
-					Кто вы?
+					{t.whoAreYou}
 				</h2>
 				<div
 					style={{
@@ -202,10 +200,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 						flex: 1,
 					}}>
 					{[
-						"Ученик начальных классов",
-						"Ученик средней школы",
-						"Студент",
-						"Взрослый / Для себя",
+					t.roleElementary, t.roleMiddle, t.roleStudent, t.roleAdult
 					].map((r) => (
 						<div
 							key={r}
@@ -236,7 +231,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 						opacity: role ? 1 : 0.5,
 						transition: "opacity 0.3s",
 					}}>
-					Далее
+					{t.next}
 				</button>
 			</div>
 		);
@@ -260,7 +255,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 						marginBottom: "20px",
 						textAlign: "center",
 					}}>
-					Ваш профиль
+					{t.yourProfile}
 				</h2>
 
 				<div
@@ -333,7 +328,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 						/>
 					</div>
 					<div className='input-group'>
-						<label>Język ojczysty</label>
+						<label>{t.nativeLanguage}</label>
 						<select
 							className='input-glass'
 							value={nativeLanguage}
@@ -444,7 +439,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 								marginTop: "auto",
 								background: "rgba(255,255,255,0.1)",
 							}}>
-							Отмена
+							{t.cancel}
 						</button>
 					</div>
 				)}
@@ -780,7 +775,7 @@ export default function AuthScreen({ onLogin, t, language, setLanguage }) {
 				)}
 				<h1 style={{ fontSize: "32px", marginBottom: "10px" }}>Luminári</h1>
 				<p style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-					Pomóżmy uczniom naprawdę zrozumieć!
+					{t.slogan}
 				</p>
 			</div>
 

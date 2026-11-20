@@ -61,6 +61,9 @@ export const translations = {
     percentage: "Процент",
     explainMistakes: "Объяснить ошибки",
     generatingExplanation: "Генерация объяснения...",
+    allCorrect: "Супер! Все ответы правильные!",
+    nativeLanguage: "Родной язык",
+    welcome: "Добро пожаловать",
   },
   en: {
     login: "Log in",
@@ -123,6 +126,9 @@ export const translations = {
     percentage: "Percentage",
     explainMistakes: "Explain my mistakes",
     generatingExplanation: "Generating explanation...",
+    allCorrect: "Great! All answers are correct!",
+    nativeLanguage: "Native Language",
+    welcome: "Welcome",
   },
 };
 
